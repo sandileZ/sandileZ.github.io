@@ -1,0 +1,60 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.container {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+#answers {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* more spacing between answer buttons */
+}
+
+.answer-btn {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+    background: #333; /* darker background */
+    color: white; /* white text for contrast */
+    font-size: 1rem;
+}
+
+.answer-btn:hover {
+    background: #444; /* slightly lighter on hover */
+}
+
+#nextBtn {
+    margin-top: 1.5rem; /* space between answers and next button */
+}

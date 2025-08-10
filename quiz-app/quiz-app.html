@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <link rel="stylesheet" href="quiz-app.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Quiz App</h2>
+    <div id="setup">
+        <label>Number of Questions:
+            <input type="number" id="amount" value="5" min="1" max="20">
+        </label>
+
+        <label>Difficulty:
+            <select id="difficulty">
+                <option value="">Any</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </label>
+
+        <button id="startBtn">Start Quiz</button>
+    </div>
+
+    <div id="quiz" class="hidden">
+        <p id="question"></p>
+        <div id="answers"></div>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <div id="result" class="hidden">
+        <h3>Your Score: <span id="score"></span></h3>
+        <button id="restartBtn">Play Again</button>
+    </div>
+</div>
+
+<script type="module" src="quiz-app.js"></script>
+</body>
+</html>

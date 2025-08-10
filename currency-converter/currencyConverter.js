@@ -1,53 +1,78 @@
-// currency-converter/currencyConverter.js
-import { fetchRates, convertCurrency } from './currencyService.js';
+import CurrencyService from './currencyService.js';
 
-let isInitialized = false;
+const amountInput = document.getElementById("amount");
+const fromCurrency = document.getElementById("fromCurrency");
+const toCurrency = document.getElementById("toCurrency");
+const resultDisplay = document.getElementById("result");
+const refreshBtn = document.getElementById("refresh");
 
-export function initCurrencyConverter() {
-    if (isInitialized) return; // avoid double-init
-    isInitialized = true;
+const ctx = document.getElementById("exchangeChart").getContext("2d");
+let chart;
 
-    const fromSelect = document.getElementById('fromCurrency');
-    const toSelect = document.getElementById('toCurrency');
-    const amountInput = document.getElementById('amount');
-    const btn = document.getElementById('convertBtn');
-    const resultDiv = document.getElementById('result');
-
-    // Populate dropdowns
-    fetchRates()
-        .then(rates => {
-            Object.keys(rates).sort().forEach(code => {
-                fromSelect.innerHTML += `<option value="${code}">${code}</option>`;
-                toSelect.innerHTML += `<option value="${code}">${code}</option>`;
-            });
-            fromSelect.value = 'USD';
-            toSelect.value = 'EUR';
-        })
-        .catch(err => {
-            resultDiv.textContent = err.message;
-        });
-
-    // Handle conversion
-    btn.addEventListener('click', async () => {
-        const from = fromSelect.value;
-        const to = toSelect.value;
+// Update the displayed live rate
+async function updateLiveRate() {
+    try {
+        const source = fromCurrency.value;
+        const target = toCurrency.value;
         const amount = parseFloat(amountInput.value);
 
-        if (!amount || amount <= 0) {
-            resultDiv.textContent = 'Enter a valid amount';
-            return;
-        }
+        const data = await CurrencyService.getLiveRates(source, target);
+        const rate = data.quotes[`${source}${target}`];
 
-        resultDiv.textContent = 'Converting…';
-
-        try {
-            const converted = await convertCurrency(from, to, amount);
-            resultDiv.textContent = `${amount} ${from} = ${converted} ${to}`;
-        } catch (e) {
-            resultDiv.textContent = e.message;
-        }
-    });
+        resultDisplay.textContent = `${amount} ${source} = ${(amount * rate).toFixed(3)} ${target}`;
+    } catch (err) {
+        console.error(err);
+        resultDisplay.textContent = "Error fetching rate";
+    }
 }
 
-// This ensures the converter initializes when the page loads
-document.addEventListener('DOMContentLoaded', initCurrencyConverter);
+// Load historical rates for the last 12 months
+async function loadHistoricalChart() {
+    try {
+        const source = fromCurrency.value;
+        const target = toCurrency.value;
+
+        const today = new Date();
+        const labels = [];
+        const dataPoints = [];
+
+        // Collect data for each month (last 12 months)
+        for (let i = 11; i >= 0; i--) {
+            const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            const formattedDate = date.toISOString().split('T')[0];
+
+            const data = await CurrencyService.getHistoricalRates(formattedDate, source, target);
+            const rate = data.quotes[`${source}${target}`];
+
+            labels.push(formattedDate);
+            dataPoints.push(rate);
+        }
+
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: `${source} to ${target}`,
+                    data: dataPoints,
+                    borderColor: '#007bff',
+                    fill: false,
+                    tension: 0.1
+                }]
+            }
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+refreshBtn.addEventListener("click", () => {
+    updateLiveRate();
+    loadHistoricalChart();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateLiveRate();
+    loadHistoricalChart();
+});

@@ -1,33 +1,22 @@
-// currencyService.js
+const CurrencyService = {
+    baseUrl: "https://api.exchangerate.host",
+    accessKey: "db224b03cb9a2cbdb51ac88d46d75213", // <-- replace with your real key
 
-const API_URL = 'https://api.exchangerate.host/latest';
+    // Get most recent exchange rates
+    async getLiveRates(source, currencies) {
+        const url = `${this.baseUrl}/live?access_key=${this.accessKey}&source=${source}&currencies=${currencies}&format=1`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch live exchange rates");
+        return await response.json(); // full object with quotes
+    },
 
-/**
- * Fetches exchange rates for the given base currency.
- * @param {string} base - ISO code of the base currency (e.g. 'USD').
- * @returns {Promise<Object>} - A map of currency codes to rates.
- */
-export async function fetchRates(base = 'USD') {
-  const res = await fetch(`${API_URL}?base=${base}`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch exchange rates');
-  }
-  const data = await res.json();
-  return data.rates;
-}
+    // Get historical rates for a given date
+    async getHistoricalRates(date, source, currencies) {
+        const url = `${this.baseUrl}/historical?access_key=${this.accessKey}&date=${date}&source=${source}&currencies=${currencies}&format=1`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch historical exchange rates");
+        return await response.json(); // full object with quotes
+    }
+};
 
-/**
- * Converts an amount from one currency to another.
- * @param {string} from - ISO code of the source currency.
- * @param {string} to - ISO code of the target currency.
- * @param {number} amount - The amount to convert.
- * @returns {Promise<string>} - Converted amount, rounded to two decimals.
- */
-export async function convertCurrency(from, to, amount) {
-  const rates = await fetchRates(from);
-  const rate = rates[to];
-  if (rate === undefined) {
-    throw new Error(`Unsupported currency: ${to}`);
-  }
-  return (amount * rate).toFixed(2);
-}
+export default CurrencyService;
