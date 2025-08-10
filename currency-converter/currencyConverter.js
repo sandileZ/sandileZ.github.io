@@ -27,8 +27,6 @@ export function initCurrencyConverter() {
       resultDiv.textContent = err.message;
     });
 
-document.addEventListener('DOMContentLoaded', initCurrencyConverter);
-
   // Handle conversion
   btn.addEventListener('click', async () => {
     const from   = fromSelect.value;
@@ -49,3 +47,5 @@ document.addEventListener('DOMContentLoaded', initCurrencyConverter);
     }
   });
 }
+
+document.addEventListener('DOMContentLoaded', initCurrencyConverter);
